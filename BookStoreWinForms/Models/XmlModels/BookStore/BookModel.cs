@@ -16,7 +16,7 @@ namespace BookstoreWinForms.Models.XmlModels.BookStore
 		public List<string> Authors { get; set; }
 
 		[XmlElement(ElementName = "year")]
-		public string Year { get; set; }
+		public int Year { get; set; }
 
 		[XmlElement(ElementName = "price")]
 		public decimal Price { get; set; }

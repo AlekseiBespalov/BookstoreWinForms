@@ -54,15 +54,30 @@ namespace BookstoreWinForms
         readonly string xsltString = @"<?xml version='1.0' encoding='UTF-8'?>
             <xsl:stylesheet version = '1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
             	<xsl:template match = '/'>
-                    <html>
+                     <html>
+                        <head>
+                            <style>
+                                table, th, td {
+                                    border: 1px solid black;
+                                    text-align:center;
+                                }
+                                table {
+                                    border-collapse: collapse;
+                                }
+                                th, td {
+                                    padding:10px;
+                                }
+                            </style>
+                        </head>
+
                         <body>
-                            <table border='1'>
-            					<tr bgcolor = '#9acd32'>
-                                    <th style = 'text-align:center'>title</th>
-            						<th style = 'text-align:center'>author</th>
-                                    <th style = 'text-align:center'>category</th>
-            						<th style = 'text-align:center'>year</th>
-                                    <th style = 'text-align:center'>price</th>
+                            <table>
+            					<tr>
+                                    <th>title</th>
+            						<th>author</th>
+                                    <th>category</th>
+            						<th>year</th>
+                                    <th>price</th>
             					</tr>
             					<xsl:for-each select = 'bookstore/book'>
                                     <tr>
@@ -135,8 +150,8 @@ namespace BookstoreWinForms
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show($"Файл занят другим приложением \n\nПолный текст ошибки: \n\n{ex.InnerException.Message}",
-                                "Ошибка в файле!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Полный текст ошибки: \n\n{ex.InnerException.Message}",
+                                "Ошибка чтения/записи", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -235,9 +250,10 @@ namespace BookstoreWinForms
                 Books = new List<BookModel>()
             };
 
+            // if price or year is text assign default value
             foreach(DataGridViewRow dr in BookstoreDataGridView.Rows)
             {
-                decimal price = 0;
+                decimal price = default;
                 try
                 {
                     price = decimal.Parse(dr.Cells[5].Value.ToString());
@@ -248,6 +264,17 @@ namespace BookstoreWinForms
                                 "Ошибка формата цены", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
+                int year = default;
+                try
+                {
+                    year = int.Parse(dr.Cells[1].Value.ToString());
+                }
+                catch
+                {
+                    MessageBox.Show($"Неверный формат года выпуска!",
+                                "Ошибка формата года выпуска", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 bookStoreModel.Books.Add(new BookModel
                 {
                     Title = new TitleModel 
@@ -255,7 +282,7 @@ namespace BookstoreWinForms
                         Text = dr.Cells[0].Value.ToString(),
                         Lang = dr.Cells[2].Value?.ToString()
                     },
-                    Year = dr.Cells[1].Value?.ToString(),
+                    Year = year,
                     Authors = dr.Cells[3].Value.ToString().Split(';').ToList(),
                     Category = dr.Cells[4].Value.ToString(),
                     Price = price
